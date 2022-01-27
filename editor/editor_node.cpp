@@ -1824,6 +1824,9 @@ void EditorNode::restart_editor() {
 		args.push_back("--disable-crash-handler");
 	}
 
+	args.push_back("--rendering-driver");
+	args.push_back(GLOBAL_GET("rendering/driver/driver_name"));
+
 	if (!to_reopen.is_empty()) {
 		args.push_back(to_reopen);
 	}

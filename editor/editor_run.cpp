@@ -105,6 +105,9 @@ Error EditorRun::run(const String &p_scene, const String &p_write_movie) {
 		screen -= 3;
 	}
 
+	args.push_back("--rendering-driver");
+	args.push_back(OS::get_singleton()->get_current_rendering_driver_name());
+
 	if (OS::get_singleton()->is_disable_crash_handler()) {
 		args.push_back("--disable-crash-handler");
 	}
