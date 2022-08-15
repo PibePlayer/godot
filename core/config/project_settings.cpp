@@ -97,7 +97,7 @@ const PackedStringArray ProjectSettings::_get_supported_features() {
 	features.append(VERSION_BRANCH "." _MKSTR(VERSION_PATCH));
 	features.append(VERSION_FULL_CONFIG);
 	features.append(VERSION_FULL_BUILD);
-	// For now, assume some RenderingDevice driver (like Vulkan) is always supported.
+	// For now, assume some RenderingDevice driver (like Vulkan or D3D12) is always supported.
 	// This should be removed if it's possible to build the editor without any.
 	features.append("Modern Clustered");
 	features.append("Modern Mobile");

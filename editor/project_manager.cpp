@@ -847,7 +847,7 @@ public:
 		rshb->add_child(rvb);
 		Button *rs_button = memnew(CheckBox);
 		rs_button->set_button_group(rasterizer_button_group);
-		rs_button->set_text(TTR("Modern Clustered (Vulkan)"));
+		rs_button->set_text(TTR("Modern Clustered (Vulkan/D3D12)"));
 		rs_button->set_meta(SNAME("driver_name"), 0); // RenderingDevice backend "Forward Clustered"
 		rs_button->set_pressed(true);
 		rvb->add_child(rs_button);
@@ -867,7 +867,7 @@ public:
 		rshb->add_child(rvb);
 		rs_button = memnew(CheckBox);
 		rs_button->set_button_group(rasterizer_button_group);
-		rs_button->set_text(TTR("Modern Mobile (Vulkan)"));
+		rs_button->set_text(TTR("Modern Mobile (Vulkan/D3D12)"));
 		rs_button->set_meta(SNAME("driver_name"), 1); // RenderingDevice backend "Forward Mobile"
 		rvb->add_child(rs_button);
 		l = memnew(Label);

@@ -18,7 +18,8 @@ layout(push_constant, std430) uniform Params {
 	vec4 position_multiplier;
 	float time;
 	float luminance_multiplier;
-	float pad[2];
+	float pad_0;
+	float pad_1;
 }
 params;
 
@@ -58,7 +59,8 @@ layout(push_constant, std430) uniform Params {
 	vec4 position_multiplier;
 	float time;
 	float luminance_multiplier;
-	float pad[2];
+	float pad_0;
+	float pad_1;
 }
 params;
 

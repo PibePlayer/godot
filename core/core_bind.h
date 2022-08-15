@@ -127,6 +127,7 @@ protected:
 public:
 	enum VideoDriver {
 		VIDEO_DRIVER_VULKAN,
+		VIDEO_DRIVER_D3D12,
 		VIDEO_DRIVER_OPENGL_3,
 	};
 

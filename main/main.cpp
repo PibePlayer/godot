@@ -1399,7 +1399,15 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	renderer_hints = "vulkan";
 #endif
 
-	// And OpenGL3 next, or first if Vulkan is disabled.
+	// Then goes D3D12 if enabled, or first if Vulkan is disabled.
+#ifdef D3D12_ENABLED
+	if (!renderer_hints.is_empty()) {
+		renderer_hints += ",";
+	}
+	renderer_hints += "d3d12";
+#endif
+
+	// And OpenGL3 next, or first if Vulkan and D3D12 are disabled.
 #ifdef GLES3_ENABLED
 	if (!renderer_hints.is_empty()) {
 		renderer_hints += ",";

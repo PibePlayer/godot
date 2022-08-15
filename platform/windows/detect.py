@@ -66,6 +66,8 @@ def get_opts():
         ("target_win_version", "Targeted Windows version, >= 0x0601 (Windows 7)", "0x0601"),
         BoolVariable("debug_symbols", "Add debugging symbols to release/release_debug builds", True),
         EnumVariable("windows_subsystem", "Windows subsystem", "gui", ("gui", "console")),
+        ("DXC_PATH", "Path to the DirectX Shader Compiler distribution (required for D3D12)", ""),
+        ("PIX_PATH", "Path to the PIX runtime distribution (optional for D3D12)", ""),
         BoolVariable("separate_debug_symbols", "Create a separate file containing debugging symbols", False),
         ("msvc_version", "MSVC version to use. Ignored if VCINSTALLDIR is set in shell env.", None),
         BoolVariable("use_mingw", "Use the Mingw compiler, even if MSVC is installed.", False),
@@ -278,6 +280,33 @@ def configure_msvc(env, manual_msvc_config):
         if not env["use_volk"]:
             LIBS += ["vulkan"]
 
+    if env["d3d12"]:
+        if env["DXC_PATH"] == "":
+            print("The Direct3D 12 rendering driver requires DXC_PATH to be set.")
+            exit(255)
+
+        env.AppendUnique(CPPDEFINES=["D3D12_ENABLED"])
+        LIBS += ["d3d12", "dxgi", "dxguid"]
+
+        # Needed for avoiding C1128.
+        if env["target"] == "release_debug":
+            env.Append(CXXFLAGS=["/bigobj"])
+
+        arch_subdir = "arm64" if env["arch"] == "arm64" else "x64"
+
+        # DXC
+        # (Overriding those in the Windows SDK.)
+        env.Prepend(CPPPATH=[env["DXC_PATH"] + "/inc"])
+        env.Prepend(LIBPATH=[env["DXC_PATH"] + "/lib/" + arch_subdir])
+        LIBS += ["dxcompiler"]
+
+        # PIX
+        if env["PIX_PATH"] != "" and env["target"] != "release":
+            env.AppendUnique(CPPDEFINES=["PIX_ENABLED"])
+            env.Append(CPPPATH=[env["PIX_PATH"] + "/Include"])
+            env.Append(LIBPATH=[env["PIX_PATH"] + "/bin/" + arch_subdir])
+            LIBS += ["WinPixEventRuntime"]
+
     if env["opengl3"]:
         env.AppendUnique(CPPDEFINES=["GLES3_ENABLED"])
         LIBS += ["opengl32"]
@@ -446,12 +475,31 @@ def configure_mingw(env):
         ]
     )
 
-    env.Append(CPPDEFINES=["VULKAN_ENABLED"])
-    if not env["use_volk"]:
-        env.Append(LIBS=["vulkan"])
+    if env["vulkan"]:
+        env.Append(CPPDEFINES=["VULKAN_ENABLED"])
+        if not env["use_volk"]:
+            env.Append(LIBS=["vulkan"])
 
-    env.Append(CPPDEFINES=["GLES3_ENABLED"])
-    env.Append(LIBS=["opengl32"])
+    if env["d3d12"]:
+        env.AppendUnique(CPPDEFINES=["D3D12_ENABLED"])
+        env.Append(LIBS=["d3d12", "dxgi", "dxguid"])
+
+        arch_subdir = "arm64" if env["arch"] == "arm64" else "x64"
+
+        # DXC
+        # (Overriding those in the Windows SDK.)
+        env.Prepend(CPPPATH=[env["DXC_PATH"] + "/inc"])
+        env.Prepend(LIBPATH=[env["DXC_PATH"] + "/lib/" + arch_subdir])
+        LIBS += ["dxcompiler"]
+
+        # PIX
+        if env["PIX_PATH"] != "" and env["target"] != "release":
+            print("PIX runtime is not supported with MinGW.")
+            exit(255)
+
+    if env["opengl3"]:
+        env.Append(CPPDEFINES=["GLES3_ENABLED"])
+        env.Append(LIBS=["opengl32"])
 
     env.Append(CPPDEFINES=["MINGW_ENABLED", ("MINGW_HAS_SECURE_API", 1)])
 
@@ -464,6 +512,11 @@ def configure(env):
     env.Prepend(CPPPATH=["#platform/windows"])
 
     print("Configuring for Windows: target=%s, bits=%s" % (env["target"], env["bits"]))
+
+    modern_display_drivers = ["vulkan", "d3d12"]
+    if not next((v for v in modern_display_drivers if env[v]), None):
+        print("At least one graphics driver of (" + ",".join(modern_display_drivers) + ") must be enabled.")
+        exit(255)
 
     if os.name == "nt":
         env["ENV"] = os.environ  # this makes build less repeatable, but simplifies some things

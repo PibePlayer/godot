@@ -5743,6 +5743,8 @@ void EditorNode::_update_rendering_driver_color() {
 		rendering_driver->add_theme_color_override("font_color", Color::hex(0x5586a4ff));
 	} else if (rendering_driver->get_text() == "vulkan") {
 		rendering_driver->add_theme_color_override("font_color", theme_base->get_theme_color(SNAME("vulkan_color"), SNAME("Editor")));
+	} else if (rendering_driver->get_text() == "d3d12") {
+		rendering_driver->add_theme_color_override("font_color", theme_base->get_theme_color(SNAME("d3d12_color"), SNAME("Editor")));
 	}
 }
 
@@ -6806,7 +6808,7 @@ EditorNode::EditorNode() {
 
 	// Hide the renderer selection dropdown until OpenGL support is more mature.
 	// The renderer can still be changed in the project settings or using `--rendering-driver opengl3`.
-	rendering_driver->set_visible(false);
+	rendering_driver->set_visible(true);
 
 	rendering_driver->set_flat(true);
 	rendering_driver->set_focus_mode(Control::FOCUS_NONE);
@@ -6831,6 +6833,9 @@ EditorNode::EditorNode() {
 		// Add the driver to the UI.
 		rendering_driver->add_item(driver);
 		rendering_driver->set_item_metadata(i, driver);
+		if (driver == "opengl3") {
+			rendering_driver->set_item_disabled(i, true);
+		}
 
 		// Lowercase for standard comparison.
 		driver = driver.to_lower();

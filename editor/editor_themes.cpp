@@ -536,8 +536,10 @@ Ref<Theme> create_editor_theme(const Ref<Theme> p_theme) {
 
 	if (!dark_theme) {
 		theme->set_color("vulkan_color", "Editor", Color::hex(0xad1128ff));
+		theme->set_color("d3d12_color", "Editor", Color::hex(0x35ad11ff));
 	} else {
 		theme->set_color("vulkan_color", "Editor", Color(1.0, 0.0, 0.0));
+		theme->set_color("d3d12_color", "Editor", Color(0.0, 1.0, 0.0));
 	}
 	const int thumb_size = EDITOR_GET("filesystem/file_dialog/thumbnail_size");
 	theme->set_constant("scale", "Editor", EDSCALE);

@@ -759,7 +759,7 @@ DisplayServerJavaScript::DisplayServerJavaScript(const String &p_rendering_drive
 
 #ifdef GLES3_ENABLED
 	// TODO "vulkan" defaults to webgl2 for now.
-	bool wants_webgl2 = p_rendering_driver == "opengl3" || p_rendering_driver == "vulkan";
+	bool wants_webgl2 = p_rendering_driver == "opengl3" || p_rendering_driver == "vulkan" || p_rendering_driver == "d3d12";
 	bool webgl2_init_failed = wants_webgl2 && !godot_js_display_has_webgl(2);
 	if (wants_webgl2 && !webgl2_init_failed) {
 		EmscriptenWebGLContextAttributes attributes;

@@ -2866,6 +2866,13 @@ void RenderingServer::init() {
 	GLOBAL_DEF("rendering/modern/staging_buffer/texture_upload_region_size_px", 64);
 	// Same for RenderingDeviceVulkan::initialize().
 	GLOBAL_DEF("rendering/vulkan/descriptor_pools/max_descriptors_per_pool", 64);
+	// Same for RenderingDeviceD3D12::initialize().
+	GLOBAL_DEF_RST("rendering/d3d12/descriptor_heaps/max_resource_descriptors_per_frame", 16384);
+	ProjectSettings::get_singleton()->set_custom_property_info("rendering/d3d12/descriptor_heaps/max_resource_descriptors_per_frame", PropertyInfo(Variant::INT, "rendering/d3d12/descriptor_heaps/max_resource_descriptors_per_frame", PROPERTY_HINT_RANGE, "512,262144"));
+	GLOBAL_DEF_RST("rendering/d3d12/descriptor_heaps/max_sampler_descriptors_per_frame", 1024);
+	ProjectSettings::get_singleton()->set_custom_property_info("rendering/d3d12/descriptor_heaps/max_sampler_descriptors_per_frame", PropertyInfo(Variant::INT, "rendering/d3d12/descriptor_heaps/max_sampler_descriptors_per_frame", PROPERTY_HINT_RANGE, "256,2048"));
+	GLOBAL_DEF_RST("rendering/d3d12/descriptor_heaps/max_misc_descriptors_per_frame", 512);
+	ProjectSettings::get_singleton()->set_custom_property_info("rendering/d3d12/descriptor_heaps/max_misc_descriptors_per_frame", PropertyInfo(Variant::INT, "rendering/d3d12/descriptor_heaps/max_misc_descriptors_per_frame", PROPERTY_HINT_RANGE, "32,4096"));
 
 	GLOBAL_DEF("rendering/shader_compiler/shader_cache/enabled", true);
 	GLOBAL_DEF("rendering/shader_compiler/shader_cache/compress", true);

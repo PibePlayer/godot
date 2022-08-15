@@ -634,7 +634,10 @@
 		<constant name="VIDEO_DRIVER_VULKAN" value="0" enum="VideoDriver">
 			The Vulkan rendering backend. It requires Vulkan 1.0 support and automatically uses features from Vulkan 1.1 and 1.2 if available.
 		</constant>
-		<constant name="VIDEO_DRIVER_OPENGL_3" value="1" enum="VideoDriver">
+		<constant name="VIDEO_DRIVER_D3D12" value="1" enum="VideoDriver">
+			The Direct3D 12 rendering backend.
+		</constant>
+		<constant name="VIDEO_DRIVER_OPENGL_3" value="2" enum="VideoDriver">
 			The OpenGL 3 rendering backend. It uses OpenGL 3.3 Core Profile on desktop platforms, OpenGL ES 3.0 on mobile devices, and WebGL 2.0 on HTML5.
 		</constant>
 		<constant name="DAY_SUNDAY" value="0" enum="Weekday">
