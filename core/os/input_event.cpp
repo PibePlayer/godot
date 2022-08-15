@@ -100,6 +100,16 @@ bool InputEvent::is_action_type() const {
 	return false;
 }
 
+#ifdef DEBUG_ENABLED
+uint64_t InputEvent::_get_parsed_frame() const {
+	return parsed_frame;
+}
+
+void InputEvent::_set_parsed_frame(uint64_t p_frame) const {
+	parsed_frame = p_frame;
+}
+#endif
+
 void InputEvent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_device", "device"), &InputEvent::set_device);
 	ClassDB::bind_method(D_METHOD("get_device"), &InputEvent::get_device);
@@ -127,6 +137,9 @@ void InputEvent::_bind_methods() {
 
 InputEvent::InputEvent() {
 	device = 0;
+#ifdef DEBUG_ENABLED
+	parsed_frame = UINT64_MAX;
+#endif
 }
 
 //////////////////

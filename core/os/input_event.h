@@ -198,6 +198,9 @@ class InputEvent : public Resource {
 	GDCLASS(InputEvent, Resource);
 
 	int device;
+#ifdef DEBUG_ENABLED
+	mutable uint64_t parsed_frame;
+#endif
 
 protected:
 	static void _bind_methods();
@@ -229,6 +232,13 @@ public:
 	virtual bool is_action_type() const;
 
 	virtual bool accumulate(const Ref<InputEvent> &p_event) { return false; }
+
+#ifdef DEBUG_ENABLED
+	// Engine-internal; never expose.
+	uint64_t _get_parsed_frame() const;
+	void _set_parsed_frame(uint64_t p_frame) const; // Breaking const correctness in this case is better than the alternatives.
+#endif
+
 	InputEvent();
 };
 
