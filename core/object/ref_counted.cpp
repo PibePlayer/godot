@@ -73,8 +73,9 @@ bool RefCounted::reference() {
 }
 
 bool RefCounted::unreference() {
-	uint32_t rc_val = refcount.unrefval();
-	bool die = rc_val == 0;
+	bool did_decrement = false;
+	uint32_t rc_val = refcount.unrefval(did_decrement);
+	bool die = rc_val == 0 && did_decrement;
 
 	if (rc_val <= 1 /* higher is not relevant */) {
 		if (get_script_instance()) {

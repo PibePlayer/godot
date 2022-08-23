@@ -130,6 +130,20 @@ public:
 		}
 	}
 
+	_ALWAYS_INLINE_ T conditional_decrement(bool &r_did_decrement) {
+		while (true) {
+			T c = value.load(std::memory_order_acquire);
+			if (c == 0) {
+				r_did_decrement = false;
+				return 0;
+			}
+			if (value.compare_exchange_weak(c, c - 1, std::memory_order_acq_rel)) {
+				r_did_decrement = true;
+				return c - 1;
+			}
+		}
+	}
+
 	_ALWAYS_INLINE_ explicit SafeNumeric<T>(T p_value = static_cast<T>(0)) {
 		set(p_value);
 	}
@@ -166,20 +180,30 @@ class SafeRefCount {
 	SafeNumeric<uint32_t> count;
 
 public:
-	_ALWAYS_INLINE_ bool ref() { // true on success
+	// - If not already 0, increments and returns true.
+	// - If already 0, does nothing and returns false.
+	// In short, returns whether whatever is being reference-counted is still owned (alive).
+	_ALWAYS_INLINE_ bool ref() {
 		return count.conditional_increment() != 0;
 	}
 
-	_ALWAYS_INLINE_ uint32_t refval() { // none-zero on success
+	// Increments if not already 0 and returns the new value.
+	_ALWAYS_INLINE_ uint32_t refval() {
 		return count.conditional_increment();
 	}
 
-	_ALWAYS_INLINE_ bool unref() { // true if must be disposed of
-		return count.decrement() == 0;
+	// - If not already 0, decrements and returns true if reached 0; false otherwise.
+	// - If already 0, does nothing and returns false.
+	// In short, returns whether whatever is being reference-counted is no longer owned (must die).
+	_ALWAYS_INLINE_ bool unref() {
+		bool did_decrement = false;
+		return count.conditional_decrement(did_decrement) == 0 && did_decrement;
 	}
 
-	_ALWAYS_INLINE_ uint32_t unrefval() { // 0 if must be disposed of
-		return count.decrement();
+	// Decrements if not already 0 and returns the new value.
+	// The caller will know whether the 0 was reached in this call.
+	_ALWAYS_INLINE_ uint32_t unrefval(bool &r_did_decrement) {
+		return count.conditional_decrement(r_did_decrement);
 	}
 
 	_ALWAYS_INLINE_ uint32_t get() const {
@@ -258,6 +282,16 @@ public:
 		}
 	}
 
+	_ALWAYS_INLINE_ T conditional_decrement(bool &r_did_decrement) {
+		if (value == 0) {
+			r_did_decrement = false;
+			return 0;
+		} else {
+			r_did_decrement = true;
+			return --value;
+		}
+	}
+
 	_ALWAYS_INLINE_ explicit SafeNumeric<T>(T p_value = static_cast<T>(0)) :
 			value(p_value) {
 	}
@@ -292,7 +326,7 @@ class SafeRefCount {
 	uint32_t count = 0;
 
 public:
-	_ALWAYS_INLINE_ bool ref() { // true on success
+	_ALWAYS_INLINE_ bool ref() {
 		if (count != 0) {
 			++count;
 			return true;
@@ -301,7 +335,7 @@ public:
 		}
 	}
 
-	_ALWAYS_INLINE_ uint32_t refval() { // none-zero on success
+	_ALWAYS_INLINE_ uint32_t refval() {
 		if (count != 0) {
 			return ++count;
 		} else {
@@ -309,12 +343,18 @@ public:
 		}
 	}
 
-	_ALWAYS_INLINE_ bool unref() { // true if must be disposed of
+	_ALWAYS_INLINE_ bool unref() {
 		return --count == 0;
 	}
 
-	_ALWAYS_INLINE_ uint32_t unrefval() { // 0 if must be disposed of
-		return --count;
+	_ALWAYS_INLINE_ uint32_t unrefval(bool &r_did_decrement) {
+		if (count == 0) {
+			r_did_decrement = false;
+			return 0;
+		} else {
+			r_did_decrement = true;
+			return --count;
+		}
 	}
 
 	_ALWAYS_INLINE_ uint32_t get() const {
